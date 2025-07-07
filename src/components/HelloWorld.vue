@@ -32,6 +32,9 @@ const count = ref(0)
     >.
   </p>
   <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
+
+  <h1 class="text-4xl font-bold text-blue-600 underline">Hello Tailwind + Vue!</h1>
+
 </template>
 
 <style scoped>

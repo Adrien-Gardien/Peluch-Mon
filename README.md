@@ -8,6 +8,12 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
 
 # Lancer le projet
 npm i
+
+
 docker compose up --build
 vue-app  |   ➜  Local:   http://localhost:5173/
 vue-app  |   ➜  Network: http://172.20.0.2:5173/
+
+!!! OU !!!
+
+npm run dev
