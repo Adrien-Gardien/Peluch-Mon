@@ -90,13 +90,15 @@
         </p>
         
         <!-- Statistiques -->
-        <div class="mb-6">
+        <div class="mb-6 max-w-xs mx-auto">
           <h4 class="text-sm font-semibold text-gray-900 mb-3">Statistiques</h4>
-          <div class="grid grid-cols-2 gap-3">
-            <div v-for="(value, stat) in pokemon.stats" :key="stat" class="flex justify-between items-center">
-              <span class="text-xs text-gray-600 capitalize">{{ stat }}</span>
-              <div class="flex items-center space-x-2">
-                <div class="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="flex flex-col gap-3">
+            <div v-for="(value, stat) in pokemon.stats" :key="stat" class="flex items-center justify-between gap-2">
+              <span class="text-xs text-gray-600 w-28 text-left">
+                {{ statLabels[stat] || stat }}
+              </span>
+              <div class="flex-1 flex items-center gap-2">
+                <div class="w-full max-w-[100px] h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div 
                     class="h-full rounded-full transition-all duration-500 delay-200"
                     :class="getStatBarClass(value)"
@@ -217,6 +219,16 @@ const getStatBarClass = (value: number) => {
   if (value >= 80) return 'bg-gradient-to-r from-yellow-500 to-yellow-600';
   if (value >= 60) return 'bg-gradient-to-r from-green-500 to-green-600';
   return 'bg-gradient-to-r from-gray-400 to-gray-500';
+};
+
+// Mapping pour labels lisibles
+const statLabels: Record<string, string> = {
+  Hp: 'HP',
+  Attack: 'Attaque',
+  Defense: 'Défense',
+  SpecialAttack: 'Att. Spé.',
+  SpecialDefense: 'Déf. Spé.',
+  Speed: 'Vitesse',
 };
 </script>
 
