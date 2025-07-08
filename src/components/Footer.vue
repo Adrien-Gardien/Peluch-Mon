@@ -14,7 +14,3 @@
     </div>
   </footer>
 </template>
-
-<script setup>
-// Pas de logique JS pour l'instant
-</script> 

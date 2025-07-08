@@ -141,9 +141,8 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Pokemon } from '../types';
-import { store, cartActions, favoriteActions } from '../store';
+import { useCart, useFavorites } from '../composables/useStore';
 
-// Props, on définit le type de la props pokemon
 interface Props {
   pokemon: Pokemon;
 }
@@ -151,20 +150,21 @@ interface Props {
 const props = defineProps<Props>();
 const router = useRouter();
 
-// Computed
+const cart = useCart();
+const favorites = useFavorites();
+
 const isFavorite = computed(() => {
-  return store.favorites.includes(props.pokemon.id);
+  return favorites.isFavorite(props.pokemon.id);
 });
 
-// Méthodes
 const toggleFavorite = (event: Event) => {
   event.stopPropagation();
-  favoriteActions.toggleFavorite(props.pokemon.id);
+  favorites.toggle(props.pokemon.id);
 };
 
 const addToCart = () => {
   if (props.pokemon.inStock) {
-    cartActions.addToCart(props.pokemon, 1);
+    cart.add(props.pokemon, 1);
   }
 };
 
@@ -177,7 +177,6 @@ const viewDetails = () => {
   router.push(`/pokemon/${props.pokemon.id}`);
 };
 
-// Classes dynamiques
 const getRarityBadgeClass = (rarity: string) => {
   const classes = {
     'Common': 'bg-gray-500',
@@ -222,7 +221,6 @@ const getStatBarClass = (value: number) => {
   return 'bg-gradient-to-r from-gray-400 to-gray-500';
 };
 
-// Mapping pour labels lisibles
 const statLabels: Record<string, string> = {
   Hp: 'HP',
   Attack: 'Attaque',

@@ -258,11 +258,12 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import ProductCard from '../components/ProductCard.vue';
 import { pokemonData } from '../data/pokemon';
-import { searchActions } from '../store';
+import { useSearch } from '../composables/useStore';
 
 const router = useRouter();
 
-// Computed
+const search = useSearch();
+
 const popularPokemon = computed(() => {
   return pokemonData
     .sort((a, b) => b.rating - a.rating)
@@ -300,9 +301,8 @@ const categories = computed(() => [
   }
 ]);
 
-// Méthodes
 const navigateToCategory = (category: string) => {
-  searchActions.updateFilters({ category: category as any });
+  search.updateFilters({ category: category as any });
   router.push('/catalog');
 };
 </script> 

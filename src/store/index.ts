@@ -1,7 +1,6 @@
-import { reactive, computed } from "vue";
-import type { AppState, CartItem, Pokemon, FilterOptions } from "../types";
+import { defineStore } from 'pinia'
+import type { AppState, Pokemon, FilterOptions, CartItem, User } from '../types'
 
-// État initial
 const initialFilters: FilterOptions = {
   category: "all",
   rarity: "all",
@@ -11,183 +10,169 @@ const initialFilters: FilterOptions = {
   sortOrder: "asc",
 };
 
-// Store principal
-export const store = reactive<AppState>({
-  cart: {
-    items: [],
-    totalItems: 0,
-    totalPrice: 0,
-  },
-  user: null,
-  favorites: [],
-  searchQuery: "",
-  filters: { ...initialFilters },
-});
+export const useMainStore = defineStore('main', {
+  state: (): AppState => ({
+    cart: {
+      items: [],
+      totalItems: 0,
+      totalPrice: 0,
+    },
+    user: null,
+    favorites: [],
+    searchQuery: "",
+    filters: { ...initialFilters },
+  }),
 
-// Actions du panier
-export const cartActions = {
-  addToCart(
-    pokemon: Pokemon,
-    quantity: number = 1,
-    variant: "normal" | "shiny" = "normal"
-  ) {
-    const existingItem = store.cart.items.find(
-      (item) =>
-        item.pokemon.id === pokemon.id && item.selectedVariant === variant
-    );
-
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      store.cart.items.push({
-        pokemon,
-        quantity,
-        selectedVariant: variant,
-      });
-    }
-
-    updateCartTotals();
-  },
-
-  removeFromCart(pokemonId: number, variant: "normal" | "shiny" = "normal") {
-    const index = store.cart.items.findIndex(
-      (item) =>
-        item.pokemon.id === pokemonId && item.selectedVariant === variant
-    );
-
-    if (index > -1) {
-      store.cart.items.splice(index, 1);
-      updateCartTotals();
-    }
-  },
-
-  updateQuantity(
-    pokemonId: number,
-    quantity: number,
-    variant: "normal" | "shiny" = "normal"
-  ) {
-    const item = store.cart.items.find(
-      (item) =>
-        item.pokemon.id === pokemonId && item.selectedVariant === variant
-    );
-
-    if (item) {
-      if (quantity <= 0) {
-        this.removeFromCart(pokemonId, variant);
-      } else {
-        item.quantity = quantity;
-        updateCartTotals();
-      }
-    }
-  },
-
-  clearCart() {
-    store.cart.items = [];
-    updateCartTotals();
-  },
-};
-
-// Actions des favoris
-export const favoriteActions = {
-  toggleFavorite(pokemonId: number) {
-    const index = store.favorites.indexOf(pokemonId);
-    if (index > -1) {
-      store.favorites.splice(index, 1);
-    } else {
-      store.favorites.push(pokemonId);
-    }
-  },
-
-  isFavorite(pokemonId: number): boolean {
-    return store.favorites.includes(pokemonId);
-  },
-};
-
-// Actions de recherche et filtres
-export const searchActions = {
-  setSearchQuery(query: string) {
-    store.searchQuery = query;
-  },
-
-  updateFilters(newFilters: Partial<FilterOptions>) {
-    Object.assign(store.filters, newFilters);
-  },
-
-  resetFilters() {
-    Object.assign(store.filters, initialFilters);
-  },
-};
-
-// Actions utilisateur
-export const userActions = {
-  setUser(user: AppState["user"]) {
-    store.user = user;
-  },
-
-  logout() {
-    store.user = null;
-    cartActions.clearCart();
-    store.favorites = [];
-  },
-};
-
-// Fonctions utilitaires
-function updateCartTotals() {
-  store.cart.totalItems = store.cart.items.reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
-  store.cart.totalPrice = store.cart.items.reduce(
-    (total, item) => total + item.pokemon.price * item.quantity,
-    0
-  );
-}
-
-// Computed properties pour faciliter l'utilisation
-export const cartComputed = {
-  totalItems: computed(() => store.cart.totalItems),
-  totalPrice: computed(() => store.cart.totalPrice),
-  formattedTotal: computed(() => `${store.cart.totalPrice.toFixed(2)}€`),
-  isEmpty: computed(() => store.cart.items.length === 0),
-  itemCount: computed(() => store.cart.items.length),
-};
-
-// Sauvegarde locale
-export const persistenceActions = {
-  saveToLocalStorage() {
-    try {
-      localStorage.setItem("pokemon-cart", JSON.stringify(store.cart));
-      localStorage.setItem(
-        "pokemon-favorites",
-        JSON.stringify(store.favorites)
+  getters: {
+    cartTotalItems: (state) => state.cart.totalItems,
+    cartTotalPrice: (state) => state.cart.totalPrice,
+    cartIsEmpty: (state) => state.cart.items.length === 0,
+    formattedTotal: (state) => `${state.cart.totalPrice.toFixed(2)}€`,
+    favoriteCount: (state) => state.favorites.length,
+    isLoggedIn: (state) => state.user !== null,
+    
+    isFavorite: (state) => (pokemonId: number) => state.favorites.includes(pokemonId),
+    
+    getCartItem: (state) => (pokemonId: number, variant: 'normal' | 'shiny' = 'normal') => {
+      return state.cart.items.find(
+        item => item.pokemon.id === pokemonId && item.selectedVariant === variant
       );
-    } catch (error) {
-      console.warn("Impossible de sauvegarder dans localStorage:", error);
-    }
+    },
   },
 
-  loadFromLocalStorage() {
-    try {
-      const savedCart = localStorage.getItem("pokemon-cart");
-      const savedFavorites = localStorage.getItem("pokemon-favorites");
+  actions: {
+    addToCart(pokemon: Pokemon, quantity = 1, variant: 'normal' | 'shiny' = 'normal') {
+      const existingItem = this.cart.items.find(
+        (item) => item.pokemon.id === pokemon.id && item.selectedVariant === variant
+      );
 
-      if (savedCart) {
-        const cartData = JSON.parse(savedCart);
-        store.cart = cartData;
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        this.cart.items.push({ pokemon, quantity, selectedVariant: variant });
       }
 
-      if (savedFavorites) {
-        store.favorites = JSON.parse(savedFavorites);
+      this.updateCartTotals();
+    },
+
+    removeFromCart(pokemonId: number, variant: 'normal' | 'shiny' = 'normal') {
+      const index = this.cart.items.findIndex(
+        (item) => item.pokemon.id === pokemonId && item.selectedVariant === variant
+      );
+
+      if (index > -1) {
+        this.cart.items.splice(index, 1);
+        this.updateCartTotals();
       }
-    } catch (error) {
-      console.warn("Impossible de charger depuis localStorage:", error);
-    }
+    },
+
+    updateQuantity(pokemonId: number, quantity: number, variant: 'normal' | 'shiny' = 'normal') {
+      const item = this.cart.items.find(
+        (item) => item.pokemon.id === pokemonId && item.selectedVariant === variant
+      );
+
+      if (item) {
+        if (quantity <= 0) {
+          this.removeFromCart(pokemonId, variant);
+        } else {
+          item.quantity = quantity;
+          this.updateCartTotals();
+        }
+      }
+    },
+
+    clearCart() {
+      this.cart.items = [];
+      this.updateCartTotals();
+    },
+
+    updateCartTotals() {
+      this.cart.totalItems = this.cart.items.reduce((total, item) => total + item.quantity, 0);
+      this.cart.totalPrice = this.cart.items.reduce((total, item) => {
+        const price = item.selectedVariant === 'shiny' ? item.pokemon.price * 1.5 : item.pokemon.price;
+        return total + price * item.quantity;
+      }, 0);
+    },
+
+    toggleFavorite(pokemonId: number) {
+      const index = this.favorites.indexOf(pokemonId);
+      if (index > -1) {
+        this.favorites.splice(index, 1);
+      } else {
+        this.favorites.push(pokemonId);
+      }
+    },
+
+    addToFavorites(pokemonId: number) {
+      if (!this.favorites.includes(pokemonId)) {
+        this.favorites.push(pokemonId);
+      }
+    },
+
+    removeFromFavorites(pokemonId: number) {
+      const index = this.favorites.indexOf(pokemonId);
+      if (index > -1) {
+        this.favorites.splice(index, 1);
+      }
+    },
+
+    clearFavorites() {
+      this.favorites = [];
+    },
+
+    setSearchQuery(query: string) {
+      this.searchQuery = query;
+    },
+
+    updateFilters(newFilters: Partial<FilterOptions>) {
+      this.filters = { ...this.filters, ...newFilters };
+    },
+
+    resetFilters() {
+      this.filters = { ...initialFilters };
+    },
+
+    setUser(user: User) {
+      this.user = user;
+    },
+
+    logout() {
+      this.user = null;
+    },
+
+    loadFromLocalStorage() {
+      try {
+        const savedCart = localStorage.getItem('peluchemon-cart');
+        const savedFavorites = localStorage.getItem('peluchemon-favorites');
+        const savedUser = localStorage.getItem('peluchemon-user');
+
+        if (savedCart) {
+          const cartData = JSON.parse(savedCart);
+          this.cart = cartData;
+        }
+
+        if (savedFavorites) {
+          this.favorites = JSON.parse(savedFavorites);
+        }
+
+        if (savedUser) {
+          this.user = JSON.parse(savedUser);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement depuis localStorage:', error);
+      }
+    },
+
+    saveToLocalStorage() {
+      try {
+        localStorage.setItem('peluchemon-cart', JSON.stringify(this.cart));
+        localStorage.setItem('peluchemon-favorites', JSON.stringify(this.favorites));
+        if (this.user) {
+          localStorage.setItem('peluchemon-user', JSON.stringify(this.user));
+        }
+      } catch (error) {
+        console.error('Erreur lors de la sauvegarde dans localStorage:', error);
+      }
+    },
   },
-};
-
-// Auto-sauvegarde
-import { watchEffect } from "vue";
-
-watchEffect(() => {
-  persistenceActions.saveToLocalStorage();
 });

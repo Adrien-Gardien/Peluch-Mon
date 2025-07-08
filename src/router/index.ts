@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 
-// Import des composants de page
 import Home from "../pages/Home.vue";
 import Catalog from "../pages/Catalog.vue";
 import ProductDetail from "../pages/ProductDetail.vue";
@@ -73,9 +72,7 @@ const router = createRouter({
   },
 });
 
-// Navigation guards pour la gestion des titres
 router.beforeEach((to) => {
-  // Mise à jour du titre de la page
   if (to.meta.title) {
     document.title = to.meta.title as string;
   }

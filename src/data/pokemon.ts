@@ -1912,7 +1912,6 @@ export const pokemonData: Pokemon[] = [
   },
 ];
 
-// Données filtrées pour les offres spéciales
 export const featuredPokemon = pokemonData.filter((p) => p.originalPrice);
 export const newArrivals = pokemonData.slice(4, 8);
 export const bestSellers = pokemonData.filter((p) => p.rating >= 4.7);

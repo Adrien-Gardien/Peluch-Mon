@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import Header from './components/Header.vue';
-import { persistenceActions } from './store';
+
 </script>
 
 <template>

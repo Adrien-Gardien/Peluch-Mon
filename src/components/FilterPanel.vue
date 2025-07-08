@@ -63,21 +63,30 @@
         <label class="block text-sm font-medium text-gray-700 mb-3">
           Prix: {{ filters.priceRange[0] }}€ - {{ filters.priceRange[1] }}€
         </label>
-        <div class="px-2">
-          <div class="relative">
-            <input
-              type="range"
-              :min="priceRange.min"
-              :max="priceRange.max"
-              :step="50"
-              v-model="filters.priceRange[0]"
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Prix minimum</label>
+            <input 
+              type="range" 
+              v-model.number="filters.priceRange[0]" 
+              :min="0" 
+              :max="1000"
+              :step="10"
               @input="updatePriceRange"
               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider"
             />
           </div>
-          <div class="flex justify-between text-xs text-gray-500 mt-2">
-            <span>{{ priceRange.min }}€</span>
-            <span>{{ priceRange.max }}€</span>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Prix maximum</label>
+            <input 
+              type="range" 
+              v-model.number="filters.priceRange[1]" 
+              :min="filters.priceRange[0]" 
+              :max="2000"
+              :step="10"
+              @input="updatePriceRange"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider"
+            />
           </div>
         </div>
       </div>
@@ -155,9 +164,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { store, searchActions } from '../store';
+import { useSearch } from '../composables/useStore';
 import { pokemonData } from '../data/pokemon';
 import type { PokemonType } from '../types';
+
+const search = useSearch();
 
 // Données pour les filtres
 const categories = computed(() => [
@@ -199,14 +210,6 @@ const rarities = computed(() => {
   ];
 });
 
-const priceRange = computed(() => {
-  const prices = pokemonData.map(p => p.price);
-  return {
-    min: Math.floor(Math.min(...prices) / 50) * 50,
-    max: Math.ceil(Math.max(...prices) / 50) * 50
-  };
-});
-
 const popularTags = computed(() => {
   const tagCounts = pokemonData.reduce((acc, pokemon) => {
     pokemon.tags.forEach(tag => {
@@ -222,16 +225,16 @@ const popularTags = computed(() => {
 });
 
 // État des filtres
-const filters = computed(() => store.filters);
+const filters = computed(() => search.filters.value);
 
 // Méthodes
 const updateCategory = (category: string) => {
-  searchActions.updateFilters({ category: category as PokemonType | 'all' });
+  search.updateFilters({ category: category as PokemonType | 'all' });
 };
 
 const updateRarity = () => {
   // Le v-model gère automatiquement la mise à jour
-  searchActions.updateFilters({ rarity: filters.value.rarity });
+  search.updateFilters({ rarity: filters.value.rarity });
 };
 
 const updatePriceRange = () => {
@@ -241,27 +244,27 @@ const updatePriceRange = () => {
     filters.value.priceRange[0] = filters.value.priceRange[1];
     filters.value.priceRange[1] = temp;
   }
-  searchActions.updateFilters({ priceRange: [...filters.value.priceRange] });
+  search.updateFilters({ priceRange: [...filters.value.priceRange] });
 };
 
 const updateAvailability = () => {
-  searchActions.updateFilters({ inStock: filters.value.inStock });
+  search.updateFilters({ inStock: filters.value.inStock });
 };
 
 const updateSort = () => {
-  searchActions.updateFilters({ sortBy: filters.value.sortBy });
+  search.updateFilters({ sortBy: filters.value.sortBy });
 };
 
 const updateSortOrder = (order: 'asc' | 'desc') => {
-  searchActions.updateFilters({ sortOrder: order });
+  search.updateFilters({ sortOrder: order });
 };
 
 const searchByTag = (tag: string) => {
-  searchActions.setSearchQuery(tag);
+  search.setQuery(tag);
 };
 
 const resetFilters = () => {
-  searchActions.resetFilters();
+  search.resetFilters();
 };
 </script>
 
@@ -300,4 +303,4 @@ const resetFilters = () => {
   background: #E5E7EB;
   border-radius: 4px;
 }
-</style> 
+</style>

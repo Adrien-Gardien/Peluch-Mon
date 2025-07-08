@@ -1,5 +1,3 @@
-// Types pour le système e-commerce Pokémon
-
 export interface Pokemon {
   id: number;
   name: string;

@@ -254,12 +254,14 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { pokemonData } from '../data/pokemon';
-import { cartActions, favoriteActions } from '../store';
+import { useCart, useFavorites } from '../composables/useStore';
 
 const router = useRouter();
 const route = useRoute();
 
-// Props
+const cartStore = useCart();
+const favoritesStore = useFavorites();
+
 interface Props {
   id?: string;
 }
@@ -268,11 +270,9 @@ const props = withDefaults(defineProps<Props>(), {
   id: ''
 });
 
-// États locaux
 const selectedImage = ref('');
 const quantity = ref(1);
 
-// Données
 const pokemon = computed(() => {
   const id = parseInt(props.id || route.params.id as string);
   return pokemonData.find(p => p.id === id);
@@ -280,7 +280,7 @@ const pokemon = computed(() => {
 
 const isFavorite = computed(() => {
   if (!pokemon.value) return false;
-  return favoriteActions.isFavorite(pokemon.value.id);
+  return favoritesStore.isFavorite(pokemon.value.id);
 });
 
 const discountPercentage = computed(() => {
@@ -326,30 +326,27 @@ const rarityClasses = computed(() => {
   return classes[pokemon.value.rarity] || classes.Common;
 });
 
-// Méthodes
 const toggleFavorite = () => {
   if (pokemon.value) {
-    favoriteActions.toggleFavorite(pokemon.value.id);
+    favoritesStore.toggle(pokemon.value.id);
   }
 };
 
 const addToCart = () => {
   if (pokemon.value && pokemon.value.inStock) {
-    cartActions.addToCart(pokemon.value, quantity.value);
-    // TODO: Afficher notification de succès
+    cartStore.add(pokemon.value, quantity.value);
   }
 };
 
 const buyNow = () => {
   if (pokemon.value && pokemon.value.inStock) {
-    cartActions.addToCart(pokemon.value, quantity.value);
+    cartStore.add(pokemon.value, quantity.value);
     router.push('/cart');
   }
 };
 
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement;
-  img.src = 'https://via.placeholder.com/400x400?text=Pokemon';
 };
 
 const formatStatName = (stat: string) => {
@@ -368,7 +365,6 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('fr-FR');
 };
 
-// Lifecycle
 onMounted(() => {
   if (pokemon.value) {
     selectedImage.value = pokemon.value.image;
