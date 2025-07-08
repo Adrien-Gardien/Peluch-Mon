@@ -140,7 +140,7 @@ import { useRouter } from 'vue-router';
 import type { Pokemon } from '../types';
 import { store, cartActions, favoriteActions } from '../store';
 
-// Props
+// Props, on définit le type de la props pokemon
 interface Props {
   pokemon: Pokemon;
 }
