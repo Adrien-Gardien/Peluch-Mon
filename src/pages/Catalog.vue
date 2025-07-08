@@ -83,7 +83,7 @@
                   <button
                     v-for="filter in activeFiltersBadges"
                     :key="filter.key"
-                    @click="removeFilter(filter.key, filter.value)"
+                    @click="removeFilter(filter.key)"
                     class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors duration-200"
                   >
                     {{ filter.label }}
@@ -123,7 +123,6 @@
                   v-for="pokemon in paginatedPokemon"
                   :key="pokemon.id"
                   :pokemon="pokemon"
-                  class=""
                 />
               </div>
 
@@ -322,7 +321,7 @@ const goToPage = (page: number) => {
   }
 };
 
-const removeFilter = (key: string, value: any) => {
+const removeFilter = (key: string) => {
   const newFilters = { ...store.filters };
   if (key === 'category') newFilters.category = 'all';
   if (key === 'rarity') newFilters.rarity = 'all';
@@ -342,4 +341,5 @@ const clearAllFilters = () => {
 watch([() => store.filters, () => store.searchQuery], () => {
   currentPage.value = 1;
 }, { deep: true });
+
 </script> 
