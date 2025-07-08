@@ -74,15 +74,6 @@
               @input="updatePriceRange"
               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider"
             />
-            <input
-              type="range"
-              :min="priceRange.min"
-              :max="priceRange.max"
-              :step="50"
-              v-model="filters.priceRange[1]"
-              @input="updatePriceRange"
-              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-slider absolute top-0"
-            />
           </div>
           <div class="flex justify-between text-xs text-gray-500 mt-2">
             <span>{{ priceRange.min }}€</span>
