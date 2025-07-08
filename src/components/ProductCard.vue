@@ -85,9 +85,10 @@
         </div>
         
         <!-- Description -->
-        <p class="text-gray-600 text-sm leading-relaxed mb-6">
-          {{ pokemon.description }}
-        </p>
+        <p class="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-2">
+  {{ pokemon.description }}
+</p>
+
         
         <!-- Statistiques -->
         <div class="mb-6 max-w-xs mx-auto">
