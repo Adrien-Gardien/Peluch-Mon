@@ -1,81 +1,121 @@
 @import "tailwindcss";
 
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  padding: 2em;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* Configuration de base pour Tailwind */
+@layer base {
+  html {
+    @apply scroll-smooth;
   }
-  a:hover {
-    color: #747bff;
+  
+  body {
+    @apply m-0 p-0 min-h-screen bg-gray-50 text-gray-900 font-sans antialiased;
   }
-  button {
-    background-color: #f9f9f9;
+  
+  #app {
+    @apply w-full min-h-screen flex flex-col;
+  }
+}
+
+/* Composants personnalisés avec Tailwind */
+@layer components {
+  /* Boutons */
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg border border-blue-600 hover:bg-blue-50 transition-all duration-200 shadow-md hover:shadow-lg;
+  }
+  
+  .btn-ghost {
+    @apply px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200;
+  }
+  
+  /* Cartes */
+  .card {
+    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden;
+  }
+  
+  .card-hover {
+    @apply hover:scale-105 hover:-translate-y-2 transition-all duration-300;
+  }
+  
+  /* Containers */
+  .container-full {
+    @apply w-full px-4 sm:px-6 lg:px-8;
+  }
+  
+  .container-section {
+    @apply w-full max-w-none px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Gradients */
+  .gradient-hero {
+    @apply bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800;
+  }
+  
+  .gradient-primary {
+    @apply bg-gradient-to-r from-blue-500 to-purple-600;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  }
+  
+  /* Inputs */
+  .input-modern {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white;
+  }
+  
+  /* Animations */
+  .animate-float {
+    @apply animate-bounce;
+  }
+  
+  .fade-in {
+    @apply opacity-0 translate-y-4;
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  
+  /* États de chargement */
+  .loading-spinner {
+    @apply animate-spin rounded-full h-5 w-5 border-2 border-gray-300 border-t-blue-600;
+  }
+}
+
+/* Animations personnalisées */
+@layer utilities {
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Classes pour les effets hover avancés */
+  .hover-lift {
+    @apply hover:-translate-y-2 hover:shadow-2xl transition-all duration-300;
+  }
+  
+  .hover-glow {
+    @apply hover:shadow-blue-500/25 hover:shadow-2xl transition-all duration-300;
+  }
+  
+  /* Scrollbar moderne */
+  .scrollbar-modern {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225) rgb(241 245 249);
+  }
+  
+  .scrollbar-modern::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-modern::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+  }
+  
+  .scrollbar-modern::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400;
   }
 }
