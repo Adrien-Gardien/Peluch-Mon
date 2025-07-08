@@ -178,9 +178,9 @@ html {
   }
 }
 
-.fade-in {
+/* .fade-in {
   animation: fadeIn 0.5s ease-out;
-}
+} */
 
 @keyframes slideIn {
   from {

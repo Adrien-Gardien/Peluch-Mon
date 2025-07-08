@@ -104,7 +104,7 @@
               v-for="pokemon in popularPokemon"
               :key="pokemon.id"
               :pokemon="pokemon"
-              class="fade-in"
+              class=""
             />
           </div>
           

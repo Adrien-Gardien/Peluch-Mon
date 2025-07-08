@@ -123,7 +123,7 @@
                   v-for="pokemon in paginatedPokemon"
                   :key="pokemon.id"
                   :pokemon="pokemon"
-                  class="fade-in"
+                  class=""
                 />
               </div>
 
