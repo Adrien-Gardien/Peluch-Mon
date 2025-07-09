@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import Header from './components/Header.vue';
+import { useMainStore } from './store';
 
+const store = useMainStore();
+
+onMounted(() => {
+  store.fetchPokemons();
+});
 </script>
 
 <template>

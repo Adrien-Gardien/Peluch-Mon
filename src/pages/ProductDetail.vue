@@ -253,7 +253,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { pokemonData } from '../data/pokemon';
+import { useMainStore } from '../store';
 import { useCart, useFavorites } from '../composables/useStore';
 
 const router = useRouter();
@@ -261,6 +261,7 @@ const route = useRoute();
 
 const cartStore = useCart();
 const favoritesStore = useFavorites();
+const store = useMainStore();
 
 interface Props {
   id?: string;
@@ -275,7 +276,7 @@ const quantity = ref(1);
 
 const pokemon = computed(() => {
   const id = parseInt(props.id || route.params.id as string);
-  return pokemonData.find(p => p.id === id);
+  return store.pokemons.find(p => p.id === id);
 });
 
 const isFavorite = computed(() => {

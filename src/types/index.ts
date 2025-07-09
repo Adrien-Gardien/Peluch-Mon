@@ -92,4 +92,6 @@ export interface AppState {
   favorites: number[];
   searchQuery: string;
   filters: FilterOptions;
+  pokemons: Pokemon[];
+  pokemonsLoading: boolean;
 }

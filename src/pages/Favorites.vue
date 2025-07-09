@@ -27,11 +27,12 @@
 import { computed } from 'vue';
 import ProductCard from '../components/ProductCard.vue';
 import { useFavorites } from '../composables/useStore';
-import { pokemonData } from '../data/pokemon';
+import { useMainStore } from '../store';
 
 const favorites = useFavorites();
+const store = useMainStore();
 
 const favoritePokemon = computed(() => {
-  return pokemonData.filter(pokemon => favorites.isFavorite(pokemon.id));
+  return store.pokemons.filter(pokemon => favorites.isFavorite(pokemon.id));
 });
 </script> 

@@ -168,7 +168,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore, useCart, useFavorites, useSearch } from '../composables/useStore';
-import { pokemonData } from '../data/pokemon';
+import { useMainStore } from '../store';
 import type { Pokemon } from '../types';
 
 const router = useRouter();
@@ -177,6 +177,7 @@ const store = useStore();
 const cart = useCart();
 const favorites = useFavorites();
 const search = useSearch();
+const mainStore = useMainStore();
 
 const showMobileMenu = ref(false);
 const showMobileSearch = ref(false);
@@ -188,8 +189,7 @@ const favoritesCount = computed(() => favorites.count.value);
 
 const searchSuggestions = computed(() => {
   if (!searchQuery.value || searchQuery.value.length < 2) return [];
-  
-  return pokemonData
+  return mainStore.pokemons
     .filter(pokemon => 
       pokemon.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       pokemon.category.toLowerCase().includes(searchQuery.value.toLowerCase())

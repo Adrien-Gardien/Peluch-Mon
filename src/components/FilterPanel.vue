@@ -31,33 +31,6 @@
         </div>
       </div>
 
-      <!-- Rareté -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-3">Rareté</label>
-        <div class="space-y-2">
-          <label
-            v-for="rarity in rarities"
-            :key="rarity.value"
-            class="flex items-center cursor-pointer"
-          >
-            <input
-              type="radio"
-              :value="rarity.value"
-              v-model="filters.rarity"
-              @change="updateRarity"
-              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-            />
-            <span class="ml-2 text-sm text-gray-700">{{ rarity.label }}</span>
-            <span
-              v-if="rarity.count"
-              class="ml-auto text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
-            >
-              {{ rarity.count }}
-            </span>
-          </label>
-        </div>
-      </div>
-
       <!-- Prix -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-3">
@@ -165,10 +138,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useSearch } from '../composables/useStore';
-import { pokemonData } from '../data/pokemon';
+import { useMainStore } from '../store';
 import type { PokemonType } from '../types';
 
 const search = useSearch();
+const store = useMainStore();
 
 // Données pour les filtres
 const categories = computed(() => [
@@ -193,34 +167,16 @@ const categories = computed(() => [
   { value: 'Normal', label: 'Normal' }
 ]);
 
-const rarities = computed(() => {
-  const rarityCounts = pokemonData.reduce((acc, pokemon) => {
-    acc[pokemon.rarity] = (acc[pokemon.rarity] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  return [
-    { value: 'all', label: 'Toutes les raretés', count: pokemonData.length },
-    { value: 'Common', label: 'Commun', count: rarityCounts.Common || 0 },
-    { value: 'Uncommon', label: 'Peu commun', count: rarityCounts.Uncommon || 0 },
-    { value: 'Rare', label: 'Rare', count: rarityCounts.Rare || 0 },
-    { value: 'Epic', label: 'Épique', count: rarityCounts.Epic || 0 },
-    { value: 'Legendary', label: 'Légendaire', count: rarityCounts.Legendary || 0 },
-    { value: 'Mythical', label: 'Mythique', count: rarityCounts.Mythical || 0 }
-  ];
-});
-
 const popularTags = computed(() => {
-  const tagCounts = pokemonData.reduce((acc, pokemon) => {
+  const tagCounts: Record<string, number> = {};
+  store.pokemons.forEach(pokemon => {
     pokemon.tags.forEach(tag => {
-      acc[tag] = (acc[tag] || 0) + 1;
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
     });
-    return acc;
-  }, {} as Record<string, number>);
-
+  });
   return Object.entries(tagCounts)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 8)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
     .map(([tag]) => tag);
 });
 
@@ -230,11 +186,6 @@ const filters = computed(() => search.filters.value);
 // Méthodes
 const updateCategory = (category: string) => {
   search.updateFilters({ category: category as PokemonType | 'all' });
-};
-
-const updateRarity = () => {
-  // Le v-model gère automatiquement la mise à jour
-  search.updateFilters({ rarity: filters.value.rarity });
 };
 
 const updatePriceRange = () => {

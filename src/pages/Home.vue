@@ -51,7 +51,7 @@
           <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div class="text-center group">
               <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-200 shadow-lg">
-                <span class="text-white text-2xl font-bold">{{ pokemonData.length }}</span>
+                <span class="text-white text-2xl font-bold">{{ pokemonCount }}</span>
               </div>
               <h3 class="text-2xl font-bold text-gray-900 mb-2">Pokémon</h3>
               <p class="text-gray-600">Dans notre collection</p>
@@ -254,55 +254,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useMainStore } from '../store';
 import ProductCard from '../components/ProductCard.vue';
-import { pokemonData } from '../data/pokemon';
-import { useSearch } from '../composables/useStore';
 
 const router = useRouter();
+const store = useMainStore();
 
-const search = useSearch();
+const pokemonCount = computed(() => store.pokemons.length);
 
-const popularPokemon = computed(() => {
-  return pokemonData
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 8);
-});
+const popularPokemon = computed(() => store.pokemons.filter(p => p.rating >= 4.5).slice(0, 8));
 
 const legendaryPokemon = computed(() => {
-  return pokemonData.filter(p => p.rarity === 'Legendary');
+  return store.pokemons.filter(p => p.rarity === 'Legendary');
 });
 
-const categories = computed(() => [
-  {
-    name: 'Electric',
-    icon: '⚡',
-    gradient: 'from-yellow-400 to-orange-500',
-    count: pokemonData.filter(p => p.category === 'Electric').length
-  },
-  {
-    name: 'Fire',
-    icon: '🔥',
-    gradient: 'from-red-500 to-pink-500',
-    count: pokemonData.filter(p => p.category === 'Fire').length
-  },
-  {
-    name: 'Water',
-    icon: '💧',
-    gradient: 'from-blue-500 to-cyan-500',
-    count: pokemonData.filter(p => p.category === 'Water').length
-  },
-  {
-    name: 'Grass',
-    icon: '🌿',
-    gradient: 'from-green-500 to-teal-500',
-    count: pokemonData.filter(p => p.category === 'Grass').length
-  }
-]);
+const categories = computed(() => {
+  // Exemple de catégories, à adapter si besoin
+  const cats = [
+    { name: 'Électrique', icon: '⚡', gradient: 'from-yellow-400 to-yellow-600', count: store.pokemons.filter(p => p.category === 'Electric').length },
+    { name: 'Feu', icon: '🔥', gradient: 'from-orange-400 to-red-600', count: store.pokemons.filter(p => p.category === 'Fire').length },
+    { name: 'Eau', icon: '💧', gradient: 'from-blue-400 to-blue-600', count: store.pokemons.filter(p => p.category === 'Water').length },
+    { name: 'Plante', icon: '🌱', gradient: 'from-green-400 to-green-600', count: store.pokemons.filter(p => p.category === 'Grass').length },
+  ];
+  return cats;
+});
 
-const navigateToCategory = (category: string) => {
-  search.updateFilters({ category: category as any });
-  router.push('/catalog');
-};
+function navigateToCategory(categoryName: string) {
+  router.push({ path: '/catalog', query: { category: categoryName } });
+}
 </script> 

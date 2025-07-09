@@ -21,6 +21,8 @@ export const useMainStore = defineStore('main', {
     favorites: [],
     searchQuery: "",
     filters: { ...initialFilters },
+    pokemons: [], // Liste dynamique des Pokémon
+    pokemonsLoading: false, // État de chargement
   }),
 
   getters: {
@@ -172,6 +174,62 @@ export const useMainStore = defineStore('main', {
         }
       } catch (error) {
         console.error('Erreur lors de la sauvegarde dans localStorage:', error);
+      }
+    },
+
+    async fetchPokemons() {
+      this.pokemonsLoading = true;
+      try {
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=200');
+        const data = await response.json();
+        // On récupère les détails de chaque Pokémon (nom + url)
+        const details = await Promise.all(
+          data.results.map(async (p: any) => {
+            const res = await fetch(p.url);
+            const poke = await res.json();
+            // Mapping minimal pour correspondre à l'ancien modèle
+            return {
+              id: poke.id,
+              name: poke.name.charAt(0).toUpperCase() + poke.name.slice(1),
+              image: poke.sprites.other["official-artwork"].front_default,
+              category: poke.types[0]?.type.name.charAt(0).toUpperCase() + poke.types[0]?.type.name.slice(1) || '',
+              stats: {
+                hp: poke.stats.find((s:any) => s.stat.name === 'hp')?.base_stat || 0,
+                attack: poke.stats.find((s:any) => s.stat.name === 'attack')?.base_stat || 0,
+                defense: poke.stats.find((s:any) => s.stat.name === 'defense')?.base_stat || 0,
+                specialAttack: poke.stats.find((s:any) => s.stat.name === 'special-attack')?.base_stat || 0,
+                specialDefense: poke.stats.find((s:any) => s.stat.name === 'special-defense')?.base_stat || 0,
+                speed: poke.stats.find((s:any) => s.stat.name === 'speed')?.base_stat || 0,
+              },
+              abilities: poke.abilities.map((a:any) => a.ability.name),
+              weight: poke.weight / 10,
+              height: poke.height / 10,
+              // Champs fictifs pour compatibilité
+              price: 199.99 + poke.id * 2,
+              rarity: (() => {
+                if (poke.id <= 20) return 'Common';
+                if (poke.id <= 50) return 'Uncommon';
+                if (poke.id <= 80) return 'Rare';
+                if (poke.id <= 120) return 'Epic';
+                if (poke.id <= 150) return 'Legendary';
+                return 'Mythical';
+              })(),
+              inStock: true,
+              stockQuantity: 10,
+              rating: 4.5,
+              reviews: [],
+              tags: poke.types.map((t:any) => t.type.name),
+              description: `Découvrez ${poke.name} !`,
+              shiny: false,
+              images: [poke.sprites.other["official-artwork"].front_default],
+            };
+          })
+        );
+        this.pokemons = details;
+      } catch (e) {
+        console.error('Erreur lors du fetch des Pokémon :', e);
+      } finally {
+        this.pokemonsLoading = false;
       }
     },
   },

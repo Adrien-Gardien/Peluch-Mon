@@ -160,19 +160,20 @@ import { ref, computed, watch } from 'vue';
 import ProductCard from '../components/ProductCard.vue';
 import FilterPanel from '../components/FilterPanel.vue';
 import { useSearch } from '../composables/useStore';
-import { pokemonData } from '../data/pokemon';
+import { useMainStore } from '../store';
 
 const search = useSearch();
+const store = useMainStore();
 
 const showMobileFilters = ref(false);
 const selectedSort = ref('name');
 const currentPage = ref(1);
 const itemsPerPage = ref(9);
 
-const totalPokemon = computed(() => pokemonData.length);
+const totalPokemon = computed(() => store.pokemons.length);
 
 const filteredPokemon = computed(() => {
-  let filtered = [...pokemonData];
+  let filtered = [...store.pokemons];
   
   if (search.query.value) {
     const query = search.query.value.toLowerCase();
@@ -188,9 +189,7 @@ const filteredPokemon = computed(() => {
     filtered = filtered.filter(pokemon => pokemon.category === search.filters.value.category);
   }
   
-  if (search.filters.value.rarity !== 'all') {
-    filtered = filtered.filter(pokemon => pokemon.rarity === search.filters.value.rarity);
-  }
+  // Je supprime le filtre sur la rareté
   
   filtered = filtered.filter(pokemon => 
     pokemon.price >= search.filters.value.priceRange[0] && 

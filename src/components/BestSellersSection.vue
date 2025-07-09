@@ -1,23 +1,15 @@
 <script setup lang="ts">
-import Card from './Card.vue'
+import { computed } from 'vue';
+import { useMainStore } from '../store';
+import Card from './Card.vue';
 
-const bestSellers = [
-  {
-    image: '/prod-ours-rose.png',
-    title: 'Ours Rose',
-    description: 'Le préféré des enfants, tout doux et irrésistible.'
-  },
-  {
-    image: '/prod-licorne-arcenciel.png',
-    title: 'Licorne Arc-en-ciel',
-    description: 'Une licorne magique pour des rêves colorés.'
-  },
-  {
-    image: '/prod-renard.png',
-    title: 'Renard Malin',
-    description: 'Un compagnon rusé et attachant.'
-  }
-]
+const store = useMainStore();
+const bestSellers = computed(() => store.pokemons.filter(p => p.rating >= 4.7).map(p => ({
+  id: p.id,
+  image: p.image,
+  title: p.name,
+  description: p.description
+})));
 </script>
 
 <template>
@@ -25,7 +17,7 @@ const bestSellers = [
     <div class="max-w-6xl mx-auto px-4">
       <h2 class="text-3xl font-bold text-gray-900 mb-10 text-center">Meilleures ventes</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <Card v-for="prod in bestSellers" :key="prod.title" v-bind="prod" />
+        <Card v-for="prod in bestSellers" :key="prod.id" :image="prod.image" :title="prod.title" :description="prod.description" />
       </div>
     </div>
   </section>
